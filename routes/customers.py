@@ -31,7 +31,9 @@ def customer_create():
 def customer_update(id):
     return "Customer update"
 
-@customers_bp.route("/delete/<id>")
+@customers_bp.route("/delete/<id>", methods=["DELETE"])
 def customer_delete(id):
-    return "Delete customer"
-
+    with get_bd_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""DELETE FROM customers WHERE id = ?""", (id,))
+        return redirect(url_for("customers.customers_list"))

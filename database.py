@@ -4,6 +4,7 @@ DATABASE = "DATABASE.db"
 def get_bd_connection():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
+    conn.execute("""PRAGMA foreign_keys = ON""")
     return conn
 
 def create_tables():
@@ -21,7 +22,7 @@ def create_tables():
             value REAL NOT NULL,
             description TEXT,
             customer_id INTEGER NOT NULL,
-            FOREIGN KEY (customer_id) REFERENCES customers(id)
+            FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
         )
         """)
         cursor.execute("""CREATE TABLE IF NOT EXISTS payments(
@@ -30,7 +31,7 @@ def create_tables():
             amount REAL NOT NULL,
             note TEXT,
             debt_id INTEGER NOT NULL,
-            FOREIGN KEY (debt_id) REFERENCES debts(id)
+            FOREIGN KEY (debt_id) REFERENCES debts(id) ON DELETE CASCADE
         )
         """)
     
