@@ -27,9 +27,16 @@ def customer_create():
         """, (name, phone))
         return redirect(url_for("customers.customers_list"))
 
-@customers_bp.route("/update/<id>")
+@customers_bp.route("/update/<id>", methods=["POST"])
 def customer_update(id):
-    return "Customer update"
+    name = request.form["name"]
+    phone = request.form["phone"]
+    if not name:
+        return "Nome obrigatório", 400
+    with get_bd_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""UPDATE customers SET name = ?, phone = ? WHERE id = ?""", (name, phone, id))
+        return jsonify({"success":True}), 200
 
 @customers_bp.route("/delete/<id>", methods=["DELETE"])
 def customer_delete(id):
