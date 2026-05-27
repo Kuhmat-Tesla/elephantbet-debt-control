@@ -16,7 +16,7 @@ def customers_list():
 
 @customers_bp.route("/create", methods=["POST"])
 def customer_create():
-    phone = request.form["phone"]
+    phone = request.form.get("phone")
     name = request.form["name"]
     if not name:
         return "Nome obrigatório", 400
@@ -30,7 +30,7 @@ def customer_create():
 @customers_bp.route("/update/<id>", methods=["POST"])
 def customer_update(id):
     name = request.form["name"]
-    phone = request.form["phone"]
+    phone = request.form.get("phone")
     if not name:
         return "Nome obrigatório", 400
     with get_bd_connection() as conn:
