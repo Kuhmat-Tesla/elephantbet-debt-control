@@ -30,8 +30,8 @@ def create_tables():
             paid_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             amount REAL NOT NULL,
             note TEXT,
-            debt_id INTEGER NOT NULL,
-            FOREIGN KEY (debt_id) REFERENCES debts(id) ON DELETE CASCADE
+            customer_id INTEGER NOT NULL,
+            FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
         )
         """)
     
