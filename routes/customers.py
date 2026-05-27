@@ -1,11 +1,18 @@
-from flask import Blueprint, redirect, url_for, request
+from flask import Blueprint, redirect, url_for, request, jsonify
 from database import get_bd_connection
 
 customers_bp = Blueprint("customers", __name__, url_prefix="/customers")
 
 @customers_bp.route("/")
 def customers_list():
-    return "Customers list"
+    with get_bd_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT * FROM customers
+        """)
+        rows = cursor.fetchall()
+        data = [dict(row) for row in rows]
+        return jsonify(data)
 
 @customers_bp.route("/create", methods=["POST"])
 def customer_create():
