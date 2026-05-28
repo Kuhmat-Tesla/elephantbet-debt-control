@@ -8,7 +8,13 @@ def customers_list():
     with get_bd_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT * FROM customers
+            SELECT 
+                customers.id,
+                customers.name,
+                customers.phone,
+                (SELECT SUM(debts.value) FROM debts WHERE debts.customer_id = customers.id) as total_debts,
+                (SELECT SUM(payments.amount) FROM payments WHERE payments.customer_id = customers.id) as total_paid
+            FROM customers
         """)
         rows = cursor.fetchall()
         data = [dict(row) for row in rows]
