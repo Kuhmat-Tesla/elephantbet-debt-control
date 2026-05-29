@@ -53,3 +53,12 @@ def customer_delete(id):
         cursor = conn.cursor()
         cursor.execute("""DELETE FROM customers WHERE id = ?""", (id,))
         return redirect(url_for("customers.customers_list"))
+
+@customers_bp.route("/search")
+def search():
+    q = request.args.get("q")
+    with get_bd_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, name FROM customers WHERE name LIKE ?", (f"%{q}%",))
+        data = cursor.fetchall()
+        return jsonify([dict(row) for row in data])
