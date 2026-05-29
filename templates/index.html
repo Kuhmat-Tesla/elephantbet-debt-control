@@ -1,62 +1,98 @@
-{% extends 'base.html' %} {% block title %}Home{% endblock %} ̃{% block main %}
-<section id="home">
-  <ul
-    id="customers_card_list"
-    class="d-flex flex-column justify-content-center"
-  ></ul>
+{% extends 'base.html' %} {% block title %}Home{% endblock %} {% block main %}
+<section id="home" class="container mt-3" style="max-width: 600px">
+  <ul id="customers_card_list" class="d-flex flex-column"></ul>
 </section>
+
 <section id="create-dept" class="d-none">
-  <p>Create debt</p>
+  {% include 'components/nova_divida.html' %}
 </section>
-<section class="d-none" id="customers-screen">
-  <p>Customers</p>
+
+<section class="d-none container mt-4 text-center" id="customers-screen">
+  <h3 class="fw-bold">Clientes</h3>
+  <p class="text-secondary">Lista geral de clientes cadastrados.</p>
+  {% include 'components/clientes.html' %}
 </section>
 
 <script>
   const customers_card_list = document.querySelector("#customers_card_list");
 
+  // Formatador de Moeda para o padrão de Kwanza (ou utilize .toLocaleString() se preferir)
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("pt-AO", {
+      style: "currency",
+      currency: "AOA",
+    })
+      .format(value)
+      .replace("AOA", "Kz");
+  };
+
   const create_card = (customer) => {
     const total_debts = customer.total_debts || 0;
     const total_paid = customer.total_paid || 0;
     const restante = total_debts - total_paid;
-    const card = `<li class="card position-relative p-1">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-          <h5 class="card-title">${customer.name}</h5>
-          <p class="card-text">${customer.phone}</p>
+
+    // Define a cor da badge de acordo com o saldo restante
+    const badgeClass =
+      restante > 0
+        ? "bg-danger-subtle text-danger"
+        : "bg-success-subtle text-success";
+    const statusText = restante > 0 ? "Pendente" : "Liquidado";
+
+    const card = `
+    <li class="card customer-card shadow-sm p-3 mb-1">
+      <div class="card-body p-1">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h5 class="card-title fw-bold mb-1 text-dark">${customer.name}</h5>
+            <p class="card-text text-muted small"><i class="bi bi-telephone me-1"></i>${customer.phone}</p>
+          </div>
+          <span class="badge ${badgeClass} px-2.5 py-1.5 rounded-pill fs-7">${statusText}</span>
         </div>
-        <div class="d-flex justify-content-between align-items-center">
-          <h6 class="card-title">Valor original:</h6>
-          <p class="card-text">${customer.total_debts}</p>
+
+        <hr class="text-black-50 my-2">
+
+        <div class="d-flex justify-content-between align-items-center py-1">
+          <span class="text-secondary fs-6">Valor original</span>
+          <span class="fw-medium text-dark">${formatCurrency(total_debts)}</span>
         </div>
-        <div class="d-flex justify-content-between align-items-center">
-          <h6 class="card-title">Valor Pago:</h6>
-          <p class="card-text">${customer.total_paid}</p>
+        <div class="d-flex justify-content-between align-items-center py-1">
+          <span class="text-secondary fs-6">Valor Pago</span>
+          <span class="fw-medium text-success">+ ${formatCurrency(total_paid)}</span>
         </div>
-        <div class="d-flex justify-content-between align-items-center">
-          <h6 class="card-title">Valor restante:</h6>
-          <p class="card-text">${customer.total_debts - customer.total_paid}</p>
+        
+        <div class="d-flex justify-content-between align-items-center pt-2 mt-1 border-top border-dashed">
+          <span class="fw-bold text-dark fs-6">Valor restante</span>
+          <span class="fw-bold ${restante > 0 ? "text-danger" : "text-success"} fs-5">${formatCurrency(restante)}</span>
         </div>
       </div>
     </li>`;
+
     customers_card_list.innerHTML += card;
   };
 
   const getCustomers = async () => {
     const url = "{{ url_for('customers.customers_list') }}";
-    const response = await fetch(url);
-    const data = await response.json();
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
 
-    data.forEach((customer) => {
-      create_card(customer);
-    });
+      if (data.length === 0) {
+        customers_card_list.innerHTML = `<div class="text-center my-5 text-muted"><i class="bi bi-inbox fs-1"></i><p class="mt-2">Nenhuma pendência encontrada</p></div>`;
+        return;
+      }
+
+      data.forEach((customer) => {
+        create_card(customer);
+      });
+    } catch (error) {
+      console.error("Erro ao buscar dados:", error);
+    }
   };
 
   getCustomers();
 
-  const set_screen = (screen_id) => {
+  const set_screen = (screen_id, element) => {
     const screens = document.querySelectorAll("section");
-
     screens.forEach((screen) => {
       if (screen.id == screen_id) {
         screen.classList.remove("d-none");
@@ -64,7 +100,12 @@
         screen.classList.add("d-none");
       }
     });
+
+    // Remove classe ativa de todos os botões e adiciona no atual
+    document
+      .querySelectorAll(".nav-bottom-item")
+      .forEach((el) => el.classList.remove("active"));
+    if (element) element.classList.add("active");
   };
 </script>
-
 {% endblock %}

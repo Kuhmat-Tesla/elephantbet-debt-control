@@ -3,10 +3,11 @@ from database import get_bd_connection
 
 debts_bp = Blueprint("debts", __name__, url_prefix="/debts")
 
-@debts_bp.route("/create/<customer_id>", methods=["POST"])
-def debts_create(customer_id):
+@debts_bp.route("/create/", methods=["POST"])
+def debts_create():
+    customer_id = request.args.get("customer_id")
     ticket_ref = request.form["ticket_ref"]
-    value = request.form["value"]
+    value = request.form["debt_value"]
     description = request.form.get("description")
     if not ticket_ref or not value:
         return jsonify({"success": False, "error": "Campos vazios"}), 400

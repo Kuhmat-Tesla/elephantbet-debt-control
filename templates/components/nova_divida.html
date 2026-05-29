@@ -1,0 +1,108 @@
+<div class="container mt-5" style="max-width: 500px">
+  <div class="card shadow-sm p-4 rounded-3 bg-white">
+    <h2 class="card-title text-center mb-4 fw-bold text-dark">
+      Criar uma nova pendência
+    </h2>
+
+    <form>
+      <div class="mb-3">
+        <label for="customer_name" class="form-label fw-medium text-secondary"
+          >Nome do Cliente</label
+        >
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0 text-secondary">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control form-control-lg fs-6 border-start-0"
+            id="customer_name"
+            name="customer_name"
+            placeholder="Ex: Kuhanga Mateus"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="ticket_ref" class="form-label fw-medium text-secondary"
+          >Código do Ticket (16 dígitos)</label
+        >
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0 text-secondary">
+            <i class="bi bi-qr-code"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control form-control-lg fs-6 border-start-0"
+            id="ticket_ref"
+            name="ticket_ref"
+            placeholder="7BD72509FECDA12B"
+            required
+            maxlength="16"
+            minlength="16"
+          />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="debt_value" class="form-label fw-medium text-secondary"
+          >Introduza o valor retido</label
+        >
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0 text-secondary"
+            >Kz</span
+          >
+          <input
+            type="number"
+            class="form-control form-control-lg fs-6 border-start-0"
+            id="debt_value"
+            name="debt_value"
+            placeholder="0,00"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="description" class="form-label fw-medium text-secondary"
+          >Descrição / Motivo</label
+        >
+        <textarea
+          class="form-control fs-6"
+          id="description"
+          name="description"
+          rows="3"
+          placeholder="Ex: Falha de sistema no momento do pagamento, faltou energia..."
+          style="resize: none"
+        ></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold">
+        Guardar
+      </button>
+    </form>
+  </div>
+</div>
+<script>
+  const form = document.querySelector("form");
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    create_debt();
+  });
+  const customer_id = 1;
+  const create_debt = async () => {
+    const url = "{{ url_for('debts.debts_create', customer_id=1) }}";
+    const response = await fetch(url, {
+      method: "POST",
+      body: new FormData(form),
+    });
+    const data = await response.json();
+    if (data.success == true) {
+      alert("Dívida Registrada!");
+      form.reset();
+    } else {
+      alert("Algo deu errado!");
+    }
+  };
+</script>
