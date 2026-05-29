@@ -15,6 +15,9 @@ def customers_list():
                 (SELECT SUM(debts.value) FROM debts WHERE debts.customer_id = customers.id) as total_debts,
                 (SELECT SUM(payments.amount) FROM payments WHERE payments.customer_id = customers.id) as total_paid
             FROM customers
+            WHERE 
+                (SELECT SUM(debts.value) FROM debts WHERE customer_id = customers.id) > 
+                (SELECT SUM(payments.amount) FROM payments WHERE customer_id = customers.id)
         """)
         rows = cursor.fetchall()
         data = [dict(row) for row in rows]

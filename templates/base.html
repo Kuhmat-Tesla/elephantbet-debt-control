@@ -18,7 +18,7 @@
     <title>{% block title %}{% endblock %}</title>
   </head>
   <body>
-    <nav class="navbar">
+    <nav class="navbar shadow">
       <div
         class="container-fluid d-flex justify-content-between align-items-center px-3"
       >
@@ -34,13 +34,14 @@
         </span>
       </div>
     </nav>
+    {% block main %} {% endblock %}
     <footer>
-      <div class="container nav-bottom">
+      <div class="container nav-bottom shadow">
         <span>
           <i class="bi bi-house-fill"></i>
           <p>Home</p>
         </span>
-        <span class="qr-code">
+        <span class="qr-code shadow">
           <i class="bi bi-qr-code-scan"></i>
         </span>
         <span>

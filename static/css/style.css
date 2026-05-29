@@ -22,6 +22,10 @@ body {
   background-color: var(--cor-primaria);
 }
 
+ul {
+  list-style: none;
+}
+
 .img-logo {
   height: 50px;
   width: auto;

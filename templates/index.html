@@ -1,11 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-<p>Hello, World</p>
-</body>
-</html>
+{% extends 'base.html' %} {% block title %}Home{% endblock %} ̃{% block main %}
+<main>
+  <ul
+    id="customers_card_list"
+    class="d-flex flex-column justify-content-center"
+  ></ul>
+</main>
+
+<script>
+  const customers_card_list = document.querySelector("#customers_card_list");
+
+  const create_card = (customer) => {
+    const total_debts = customer.total_debts || 0;
+    const total_paid = customer.total_paid || 0;
+    const restante = total_debts - total_paid;
+    const card = `<li class="card position-relative p-1">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title">${customer.name}</h5>
+          <p class="card-text">${customer.phone}</p>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <h6 class="card-title">Valor original:</h6>
+          <p class="card-text">${customer.total_debts}</p>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <h6 class="card-title">Valor Pago:</h6>
+          <p class="card-text">${customer.total_paid}</p>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <h6 class="card-title">Valor restante:</h6>
+          <p class="card-text">${customer.total_debts - customer.total_paid}</p>
+        </div>
+      </div>
+    </li>`;
+    customers_card_list.innerHTML += card;
+  };
+
+  const getCustomers = async () => {
+    const url = "{{ url_for('customers.customers_list') }}";
+    const response = await fetch(url);
+    const data = await response.json();
+
+    data.forEach((customer) => {
+      create_card(customer);
+    });
+  };
+
+  getCustomers();
+</script>
+
+{% endblock %}
