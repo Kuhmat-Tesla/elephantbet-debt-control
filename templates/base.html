@@ -37,14 +37,14 @@
     {% block main %} {% endblock %}
     <footer>
       <div class="container nav-bottom shadow">
-        <span>
+        <span onclick="set_screen('home')">
           <i class="bi bi-house-fill"></i>
           <p>Home</p>
         </span>
-        <span class="qr-code shadow">
+        <span class="qr-code shadow" onclick="set_screen('create-dept')">
           <i class="bi bi-qr-code-scan"></i>
         </span>
-        <span>
+        <span onclick="set_screen('customers-screen')">
           <i class="bi bi-people-fill"></i>
           <p>Clientes</p>
         </span>

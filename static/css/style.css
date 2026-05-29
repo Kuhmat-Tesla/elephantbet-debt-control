@@ -65,3 +65,6 @@ span p {
   align-items: center;
   background-color: var(--cor-primaria);
 }
+p {
+  color:black; !important
+}

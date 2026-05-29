@@ -1,10 +1,16 @@
 {% extends 'base.html' %} {% block title %}Home{% endblock %} ̃{% block main %}
-<main>
+<section id="home">
   <ul
     id="customers_card_list"
     class="d-flex flex-column justify-content-center"
   ></ul>
-</main>
+</section>
+<section id="create-dept" class="d-none">
+  <p>Create debt</p>
+</section>
+<section class="d-none" id="customers-screen">
+  <p>Customers</p>
+</section>
 
 <script>
   const customers_card_list = document.querySelector("#customers_card_list");
@@ -47,6 +53,18 @@
   };
 
   getCustomers();
+
+  const set_screen = (screen_id) => {
+    const screens = document.querySelectorAll("section");
+
+    screens.forEach((screen) => {
+      if (screen.id == screen_id) {
+        screen.classList.remove("d-none");
+      } else {
+        screen.classList.add("d-none");
+      }
+    });
+  };
 </script>
 
 {% endblock %}
