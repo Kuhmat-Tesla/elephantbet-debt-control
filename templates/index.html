@@ -99,9 +99,12 @@
       } else {
         screen.classList.add("d-none");
       }
+      if (screen.id == "home") {
+        customers_card_list.innerHTML = "";
+        getCustomers();
+      }
     });
 
-    // Remove classe ativa de todos os botões e adiciona no atual
     document
       .querySelectorAll(".nav-bottom-item")
       .forEach((el) => el.classList.remove("active"));

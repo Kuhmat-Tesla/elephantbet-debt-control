@@ -5,7 +5,7 @@
     </h2>
 
     <form>
-      <div class="mb-3">
+      <div class="mb-3 position-relative">
         <label for="customer_name" class="form-label fw-medium text-secondary"
           >Nome do Cliente</label
         >
@@ -19,8 +19,16 @@
             id="customer_name"
             name="customer_name"
             placeholder="Ex: Kuhanga Mateus"
+            autocomplete="off"
             required
           />
+        </div>
+
+        <div
+          class="search-popup d-none position-absolute w-100 start-0 mt-1 shadow-lg bg-white rounded-3"
+          style="z-index: 1050; max-height: 200px; overflow-y: auto"
+        >
+          <ul class="list-popup list-group list-group-flush mb-0"></ul>
         </div>
       </div>
 
@@ -86,23 +94,92 @@
 </div>
 <script>
   const form = document.querySelector("form");
+  const customer_name = document.querySelector("#customer_name");
+  const search_popup = document.querySelector(".search-popup");
+  const list_popup = document.querySelector(".list-popup");
+  let selected_customer_id = null;
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     create_debt();
   });
-  const customer_id = 1;
+
   const create_debt = async () => {
-    const url = "{{ url_for('debts.debts_create', customer_id=1) }}";
-    const response = await fetch(url, {
-      method: "POST",
-      body: new FormData(form),
-    });
-    const data = await response.json();
-    if (data.success == true) {
-      alert("Dívida Registrada!");
-      form.reset();
-    } else {
-      alert("Algo deu errado!");
+    if (!selected_customer_id) {
+      alert("Selecciona um cliente primeiro");
+      return;
+    }
+    const url = `/debts/create/${selected_customer_id}`;
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        body: new FormData(form),
+      });
+      const data = await response.json();
+      if (data.success == true) {
+        alert("Dívida Registrada!");
+        form.reset();
+      } else {
+        alert(data.error);
+      }
+    } catch (error) {
+      alert(`Algo deu errado ${error}`);
     }
   };
+
+  customer_name.addEventListener("input", async (event) => {
+    let args = customer_name.value.trim();
+
+    if (args.length === 0) {
+      search_popup.classList.add("d-none");
+      list_popup.innerHTML = "";
+      return;
+    }
+
+    const baseUrl = "{{ url_for('customers.search') }}";
+    const url = `${baseUrl}?q=${encodeURIComponent(args)}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      list_popup.innerHTML = "";
+
+      if (data.length > 0) {
+        data.forEach((customer) => {
+          const html = `
+          <li class="list-group-item list-group-item-action item-cliente"
+              style="cursor: pointer;"
+              data-id="${customer.id}">
+            ${customer.name}
+          </li>`;
+          list_popup.innerHTML += html;
+        });
+        search_popup.classList.remove("d-none");
+      } else {
+        search_popup.classList.add("d-none");
+      }
+    } catch (error) {
+      console.error("Erro na busca:", error);
+    }
+  });
+  list_popup.addEventListener("click", (event) => {
+    const itemClicado = event.target.closest(".item-cliente");
+
+    if (itemClicado) {
+      customer_name.value = itemClicado.textContent.trim();
+      selected_customer_id = itemClicado.dataset.id;
+      search_popup.classList.add("d-none");
+      list_popup.innerHTML = "";
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (
+      !customer_name.contains(event.target) &&
+      !search_popup.contains(event.target)
+    ) {
+      search_popup.classList.add("d-none");
+    }
+  });
 </script>
